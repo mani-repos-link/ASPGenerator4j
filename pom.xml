@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>AspLogGenerator</groupId>
+	<artifactId>AspLogGenerator</artifactId>
+	<version>1.2</version>
+	<name>AspLogGenerator</name>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<release>11</release>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository> <!-- Repo for local stored libraries -->
+			<id>local-jars</id>
+			<url>file://${project.basedir}/libs</url>
+		</repository>
+		<repository> <!-- Repo for clingo library -->
+			<id>des-releases-public</id>
+			<name>denkbares Public Releases Repository</name>
+			<url>https://repo.denkbares.com/releases-public/</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>OpenXES</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.potassco</groupId>
+			<artifactId>clingo</artifactId>
+			<version>1.0-des-rc1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+	</dependencies>
+</project>
+
