@@ -2,11 +2,12 @@ package main.java;
 
 import main.java.generator.AspGenerator;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.out.XesXmlSerializer;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -17,7 +18,7 @@ public class Runner {
         int minTraceSize = 2;
         int maxTraceSize = 2;
         int logSize = 5;
-        XLog log = AspGenerator.generateLog(
+        XLog generatedLog = AspGenerator.generateLog(
                 declModelFile.toPath(),
                 minTraceSize,
                 maxTraceSize,
@@ -25,5 +26,10 @@ public class Runner {
                 LocalDateTime.now(),
                 Duration.ofHours(4)
         );
+        String fileName = "generated_output/log.xes";
+        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileName));
+        XesXmlSerializer serializer = new XesXmlSerializer();
+        serializer.serialize(generatedLog, outputStream);
+        outputStream.close();
     }
 }

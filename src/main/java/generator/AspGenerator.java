@@ -66,8 +66,7 @@ public class AspGenerator {
 	private static SortedSet<Integer> invalidLengths;
 	private static XLog generatedLog;
 
-	private AspGenerator() {
-	}
+	private AspGenerator() { }
 
 	public static XLog generateLog(
 			Path declModelPath,
