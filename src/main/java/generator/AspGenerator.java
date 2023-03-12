@@ -84,6 +84,7 @@ public class AspGenerator {
 		DeclareModel declModel = Parser.parse(declModelPath);
 
 		String lpModelString = decl2lp(declModel);
+		System.out.println(lpModelString);
 
 		ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -125,16 +126,19 @@ public class AspGenerator {
 					seed = getRandomWithoutExcluded(rnd, MIN_CLINGO_SEED, MAX_CLINGO_SEED, extractedSeeds);
 					extractedSeeds.add(seed);
 				}
-				Control control = new Control("-c",
+				Control control = new Control(
+								"-c",
 						"t=" + length,
-						String.valueOf(1),    // Means only one trace per single clingo run
+						String.valueOf(1),   // Means only one trace per single clingo run
 						// The next options should make the output the more random as possible
 						// (their meaning can be found on clingo user guide)
 						"--project",
 						"--sign-def=rnd",
 						"--rand-freq=0.9",
 						"--restart-on-model",
-						"--seed=" + seed);
+//						"--seed=8794"
+						"--seed=" + seed
+				);
 				control.add(lpModel);
 				control.add(Global.LP_GENERATION_PROBLEM);
 				control.add(Global.LP_TEMPLATES);
@@ -145,6 +149,7 @@ public class AspGenerator {
 
 				while (handle.hasNext()) {
 					Model model = handle.next();
+					System.out.println(model);
 					XTrace t = getXTraceFromClingoTrace(declModel, model, startTime, interval);
 					synchronized (generatedLog) {
 						generatedLog.add(t);
@@ -167,20 +172,16 @@ public class AspGenerator {
 
 	private static int getRandomWithoutExcluded(Random rnd, int start, int end, SortedSet<Integer> excluded) throws IllegalArgumentException {
 		int newRandom = start + rnd.nextInt(end - start + 1 - excluded.size());
-
 		if (!excluded.headSet(newRandom + 1).isEmpty()) {
 			if (!excluded.contains(newRandom + excluded.headSet(newRandom + 1).size())) {
 				newRandom += excluded.headSet(newRandom + 1).size();
-
 			} else {
 				int tmp = newRandom;
 				while (excluded.contains(newRandom + excluded.headSet(tmp + 1).size()))
 					tmp = newRandom + excluded.headSet(tmp + 1).size();
-
 				newRandom = tmp + 1;
 			}
 		}
-
 		return newRandom;
 	}
 
@@ -194,6 +195,16 @@ public class AspGenerator {
 		for (Activity act : declModel.getActivities()) {
 			lpBuilder.append("activity(" + act.getEncodedName() + ").");
 			lpBuilder.append(ls);
+		}
+
+
+		for (Map.Entry<Activity, Set<Attribute>> binding : declModel.getBindings().entrySet()) {
+			Activity act = binding.getKey();
+
+			for (Attribute boundAtt : binding.getValue()) {
+				lpBuilder.append("has_attribute(" + act.getEncodedName() + "," + boundAtt.getEncodedName() + ").");
+				lpBuilder.append(ls);
+			}
 		}
 
 		for (Attribute att : declModel.getAttributes()) {
@@ -229,14 +240,6 @@ public class AspGenerator {
 			}
 		}
 
-		for (Map.Entry<Activity, Set<Attribute>> binding : declModel.getBindings().entrySet()) {
-			Activity act = binding.getKey();
-
-			for (Attribute boundAtt : binding.getValue()) {
-				lpBuilder.append("has_attribute(" + act.getEncodedName() + "," + boundAtt.getEncodedName() + ").");
-				lpBuilder.append(ls);
-			}
-		}
 
 		int constraintIndex = 0;
 		for (Constraint c : declModel.getConstraints()) {

@@ -15,7 +15,8 @@ public class CategoricalAttribute extends Attribute {
 	public CategoricalAttribute(String name, Set<String> values) {
 		super(name);
 		this.values = values;
-		this.encodedValues = Encoder.getAttributeValuesEncoding(this.getEncodedName(), values.size());
+//		this.encodedValues = Encoder.getAttributeValuesEncoding(this.getEncodedName(), values.size());
+		this.encodedValues = Encoder.getAttributeValuesEncoding(this.values.toArray(String[]::new));
 	}
 	
 	public Set<String> getValues() {

@@ -1,7 +1,9 @@
 package main.java;
 
 import main.java.generator.AspGenerator;
+import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.out.XesXmlSerializer;
 
 import java.io.BufferedOutputStream;
@@ -14,10 +16,12 @@ import java.time.LocalDateTime;
 public class Runner {
     public static void main(String[] args) throws InterruptedException, IOException {
         //Path declModelPath = Paths.get();
-        File declModelFile = new File("src/main/resources/models/declare/decl-model4.decl");
-        int minTraceSize = 2;
-        int maxTraceSize = 2;
+//        File declModelFile = new File("src/main/resources/models/declare/decl-model4.decl");
+//        File declModelFile = new File("src/main/resources/models/declare/decl-model5.decl");
+        File declModelFile = new File("src/main/resources/models/declare/model4.decl");
         int logSize = 5;
+        int minTraceSize = 20;
+        int maxTraceSize = 30;
         XLog generatedLog = AspGenerator.generateLog(
                 declModelFile.toPath(),
                 minTraceSize,
@@ -26,10 +30,17 @@ public class Runner {
                 LocalDateTime.now(),
                 Duration.ofHours(4)
         );
-        String fileName = "generated_output/log.xes";
+        int counter = 0;
+        for (XTrace x : generatedLog) {
+            XConceptExtension.instance()
+                    .assignName(x, "Case No. " + counter++ + " [positive]");
+        }
+
+        String fileName = "generated_output/log2.xes";
         BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileName));
         XesXmlSerializer serializer = new XesXmlSerializer();
         serializer.serialize(generatedLog, outputStream);
+
         outputStream.close();
     }
 }

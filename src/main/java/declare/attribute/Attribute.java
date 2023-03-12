@@ -10,7 +10,7 @@ public abstract class Attribute {
 	
 	public Attribute(String name) {
 		this.name = name;
-		this.encodedName = Encoder.getAttributeEncoding();
+		this.encodedName = Encoder.getAttributeEncoding(name);
 	}
 	
 	public String getName() {

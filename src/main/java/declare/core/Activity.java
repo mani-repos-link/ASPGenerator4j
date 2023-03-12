@@ -10,7 +10,7 @@ public class Activity {
 	
 	public Activity(String name) {
 		this.name = name;
-		this.encodedName = Encoder.getActivityEncoding();
+		this.encodedName = Encoder.getActivityEncoding(name);
 	}
 
 	public String getName() {
