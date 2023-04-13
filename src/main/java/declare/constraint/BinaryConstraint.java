@@ -36,7 +36,7 @@ public class BinaryConstraint extends Constraint {
 		);
 		
 		return this.getTemplate() + "[" + activities + "]"
-				+ " |" + this.getActivationCond() 
+				+ " |" + this.getActivationCond()
 				+ " |" + targetCond 
 				+ " |" + (this.getTimeCond()==null ? "" : this.getTimeCond().toString());
 	}

@@ -49,141 +49,29 @@ public class AspGenerator {
 	private static Random rnd = new Random();
 
 	/*
-    Since ASP isn't able to handle floating attributes (infinite values in a range), here they are
-    discretized with a precision equals to the least significant floating digit of the range bounds and predicate values too.
+		Since ASP isn't able to handle floating attributes (infinite values in a range), here they are
+		discretized with a precision equals to the least significant floating digit of the range bounds and predicate values too.
 
-    E.g.:
-    The line "attribute: float between 1.120 and 2.0" will be treated as "attribute: integer between 112 and 200",
-    then each computed integer will be scaled again to the correct floating that it represents.
-    Note that if a predicate "attribute > 1.808" was present, then the values will be scaled by 3 digits,
-    for example the data line would be "attribute: integer between 1120 and 2000".
+		E.g.:
+		The line "attribute: float between 1.120 and 2.0" will be treated as "attribute: integer between 112 and 200",
+		then each computed integer will be scaled again to the correct floating that it represents.
+		Note that if a predicate "attribute > 1.808" was present, then the values will be scaled by 3 digits,
+		for example the data line would be "attribute: integer between 1120 and 2000".
 
-    Below, the map floatingAttributes contains entries formed by the name of the attribute and the number
-    of significant digit to scale.
-    */
+		Below, the map floatingAttributes contains entries formed by the name of the attribute and the number
+		of significant digit to scale.
+		*/
 	private static Map<Attribute, Integer> floatingAttributes;
 	private static SortedSet<Integer> extractedSeeds;
 	private static SortedSet<Integer> invalidLengths;
 	private static XLog generatedLog;
 
-	private AspGenerator() { }
-
-	public static XLog generateLog(
-			Path declModelPath,
-			int minTraceLength,
-			int maxTraceLength,
-			int logLength,
-			LocalDateTime startTime,
-			Duration interval) throws InterruptedException, IOException {
-
-		floatingAttributes = new HashMap<>();
-		generatedLog = new XLogImpl(new XAttributeMapImpl());
-		extractedSeeds = new TreeSet<>();
-		invalidLengths = new TreeSet<>();
-
-		DeclareModel declModel = Parser.parse(declModelPath);
-
-		String lpModelString = decl2lp(declModel);
-
-		ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-		for (int i = 0; i < logLength; i++) {
-			pool.execute(() -> {
-				try {
-					getXTraceFromClingo(declModel, lpModelString, minTraceLength, maxTraceLength, startTime, interval);
-				} catch (IOException | InterruptedException e) {
-					pool.shutdownNow();
-					e.printStackTrace();
-				}
-			});
-		}
-
-		pool.shutdown();
-		pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
-		return generatedLog;
+	private AspGenerator() {
 	}
 
-	private static void getXTraceFromClingo(
-			DeclareModel declModel,
-			String lpModel,
-			int minTraceLength,
-			int maxTraceLength,
-			LocalDateTime startTime,
-			Duration interval) throws IOException, InterruptedException {
 
-		try {
-			boolean isInvalidLength;
-			do {
-				int length;
-				synchronized (invalidLengths) {
-					length = getRandomWithoutExcluded(rnd, minTraceLength, maxTraceLength, invalidLengths);
-				}
-
-				int seed;
-				synchronized (extractedSeeds) {
-					seed = getRandomWithoutExcluded(rnd, MIN_CLINGO_SEED, MAX_CLINGO_SEED, extractedSeeds);
-					extractedSeeds.add(seed);
-				}
-				Control control = new Control("-c",
-						"t=" + length,
-						String.valueOf(1),    // Means only one trace per single clingo run
-						// The next options should make the output the more random as possible
-						// (their meaning can be found on clingo user guide)
-						"--project",
-						"--sign-def=rnd",
-						"--rand-freq=0.9",
-						"--restart-on-model",
-						"--seed=" + seed);
-				control.add(lpModel);
-				control.add(Global.LP_GENERATION_PROBLEM);
-				control.add(Global.LP_TEMPLATES);
-				control.ground();
-
-				SolveHandle handle = control.solve(SolveMode.YIELD);
-				isInvalidLength = handle.getSolveResult().unsatisfiable();
-
-				while (handle.hasNext()) {
-					Model model = handle.next();
-					XTrace t = getXTraceFromClingoTrace(declModel, model, startTime, interval);
-					synchronized (generatedLog) {
-						generatedLog.add(t);
-					}
-				}
-
-				control.close();
-
-				if (isInvalidLength)
-					synchronized (invalidLengths) {
-						invalidLengths.add(length);
-					}
-
-			} while (isInvalidLength);
-
-		} catch (IllegalArgumentException e) {
-			throw new IOException("Cannot generate traces with this range of event numbers.");
-		}
-	}
-
-	private static int getRandomWithoutExcluded(Random rnd, int start, int end, SortedSet<Integer> excluded) throws IllegalArgumentException {
-		int newRandom = start + rnd.nextInt(end - start + 1 - excluded.size());
-
-		if (!excluded.headSet(newRandom + 1).isEmpty()) {
-			if (!excluded.contains(newRandom + excluded.headSet(newRandom + 1).size())) {
-				newRandom += excluded.headSet(newRandom + 1).size();
-
-			} else {
-				int tmp = newRandom;
-				while (excluded.contains(newRandom + excluded.headSet(tmp + 1).size()))
-					tmp = newRandom + excluded.headSet(tmp + 1).size();
-
-				newRandom = tmp + 1;
-			}
-		}
-
-		return newRandom;
-	}
-
+	// convert Declare model to LP(logic program)
+	// TODO: improve code quality
 	private static String decl2lp(DeclareModel declModel) {
 		StringBuilder lpBuilder = new StringBuilder();
 		String ls = System.lineSeparator();
@@ -211,8 +99,8 @@ public class AspGenerator {
 				if (att instanceof IntegerAttribute) {
 					IntegerAttribute intAtt = (IntegerAttribute) att;
 					lpBuilder.append("value(" + attName + ","
-							+ intAtt.getLowerBound() + ".."
-							+ intAtt.getUpperBound() + ")."
+									+ intAtt.getLowerBound() + ".."
+									+ intAtt.getUpperBound() + ")."
 					);
 
 				} else {    // FloatAttribute
@@ -220,8 +108,8 @@ public class AspGenerator {
 					int digitsToScale = floatingAttributes.get(floatAtt);
 
 					lpBuilder.append("value(" + attName + ","
-							+ Math.round(floatAtt.getLowerBound() * Math.pow(10, digitsToScale)) + ".."
-							+ Math.round(floatAtt.getUpperBound() * Math.pow(10, digitsToScale)) + ")."
+									+ Math.round(floatAtt.getLowerBound() * Math.pow(10, digitsToScale)) + ".."
+									+ Math.round(floatAtt.getUpperBound() * Math.pow(10, digitsToScale)) + ")."
 					);
 				}
 
@@ -289,6 +177,123 @@ public class AspGenerator {
 		}
 
 		return lpBuilder.toString();
+	}
+
+	public static XLog generateLog(
+					Path declModelPath,
+					int minTraceLength,
+					int maxTraceLength,
+					int logLength,
+					LocalDateTime startTime,
+					Duration interval) throws InterruptedException, IOException {
+
+		floatingAttributes = new HashMap<>();
+		generatedLog = new XLogImpl(new XAttributeMapImpl());
+		extractedSeeds = new TreeSet<>();
+		invalidLengths = new TreeSet<>();
+
+		DeclareModel declModel = Parser.parse(declModelPath);
+
+		String lpModelString = decl2lp(declModel);
+
+		ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		for (int i = 0; i < logLength; i++) {
+			pool.execute(() -> {
+				try {
+					getXTraceFromClingo(declModel, lpModelString, minTraceLength, maxTraceLength, startTime, interval);
+				} catch (IOException | InterruptedException e) {
+					pool.shutdownNow();
+					e.printStackTrace();
+				}
+			});
+		}
+
+		pool.shutdown();
+		pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+		return generatedLog;
+	}
+
+
+	private static void getXTraceFromClingo(
+					DeclareModel declModel,
+					String lpModel,
+					int minTraceLength,
+					int maxTraceLength,
+					LocalDateTime startTime,
+					Duration interval) throws IOException, InterruptedException {
+
+		try {
+			boolean isInvalidLength;
+			do {
+				int length;
+				synchronized (invalidLengths) {
+					length = getRandomWithoutExcluded(rnd, minTraceLength, maxTraceLength, invalidLengths);
+				}
+
+				int seed;
+				synchronized (extractedSeeds) {
+					seed = getRandomWithoutExcluded(rnd, MIN_CLINGO_SEED, MAX_CLINGO_SEED, extractedSeeds);
+					extractedSeeds.add(seed);
+				}
+				Control control = new Control("-c",
+								"t=" + length,
+								String.valueOf(1),    // Means only one trace per single clingo run
+								// The next options should make the output the more random as possible
+								// (their meaning can be found on clingo user guide)
+								"--project",
+								"--sign-def=rnd",
+								"--rand-freq=0.9",
+								"--restart-on-model",
+								"--seed=" + seed);
+				control.add(lpModel);
+				control.add(ASPProgramUtility.LP_GENERATION_PROBLEM);
+				control.add(ASPProgramUtility.LP_TEMPLATES);
+				control.ground();
+
+				SolveHandle handle = control.solve(SolveMode.YIELD);
+				isInvalidLength = handle.getSolveResult().unsatisfiable();
+
+				while (handle.hasNext()) {
+					Model model = handle.next();
+					XTrace t = getXTraceFromClingoTrace(declModel, model, startTime, interval);
+					synchronized (generatedLog) {
+						generatedLog.add(t);
+					}
+				}
+
+				control.close();
+
+				if (isInvalidLength)
+					synchronized (invalidLengths) {
+						invalidLengths.add(length);
+					}
+
+			} while (isInvalidLength);
+
+		} catch (IllegalArgumentException e) {
+			throw new IOException("Cannot generate traces with this range of event numbers.");
+		}
+	}
+
+	private static int getRandomWithoutExcluded(Random rnd, int start, int end, SortedSet<Integer> excluded) throws IllegalArgumentException {
+		int newRandom = start + rnd.nextInt(end - start + 1 - excluded.size());
+
+		if (!excluded.headSet(newRandom + 1).isEmpty()) {
+			if (!excluded.contains(newRandom + excluded.headSet(newRandom + 1).size())) {
+				newRandom += excluded.headSet(newRandom + 1).size();
+
+			} else {
+				int tmp = newRandom;
+				while (excluded.contains(newRandom + excluded.headSet(tmp + 1).size()))
+					tmp = newRandom + excluded.headSet(tmp + 1).size();
+
+				newRandom = tmp + 1;
+			}
+		}
+
+		return newRandom;
 	}
 
 	private static void setFloatMaxPrecision(Set<Attribute> attributes, Set<Constraint> constraints) {
@@ -368,7 +373,7 @@ public class AspGenerator {
 						break;
 					default:
 						throw new UnsupportedOperationException(
-								"Operator: " + root.getOperator() + " is not yet supported!"
+										"Operator: " + root.getOperator() + " is not yet supported!"
 						);
 				}
 			}
@@ -405,7 +410,7 @@ public class AspGenerator {
 				break;
 			default:
 				throw new UnsupportedOperationException(
-						"Operator: " + nested.getOperator() + " is not yet supported!"
+								"Operator: " + nested.getOperator() + " is not yet supported!"
 				);
 		}
 	}
@@ -467,7 +472,7 @@ public class AspGenerator {
 			}
 			default:
 				throw new UnsupportedOperationException(
-						"Operator: " + attrPred.getOperator() + " is not yet supported!"
+								"Operator: " + attrPred.getOperator() + " is not yet supported!"
 				);
 		}
 
@@ -497,9 +502,9 @@ public class AspGenerator {
 				case "trace":    // Activity of the event
 					// Restoring real (decoded) activity name
 					String actName = declModel.getActivities().stream()
-							.filter(act -> act.getEncodedName().equals(args.get(0)))
-							.map(act -> act.getName())
-							.findFirst().get();
+									.filter(act -> act.getEncodedName().equals(args.get(0)))
+									.map(act -> act.getName())
+									.findFirst().get();
 
 					XConceptExtension.instance().assignName(evt, actName);
 					// Assigning timestamp and transition to the event
@@ -509,8 +514,8 @@ public class AspGenerator {
 
 				case "assigned_value":    // Attribute of the event
 					Attribute att = declModel.getAttributes().stream()
-							.filter(item -> item.getEncodedName().equals(args.get(0)))
-							.findFirst().get();
+									.filter(item -> item.getEncodedName().equals(args.get(0)))
+									.findFirst().get();
 					// Restoring real (decoded) attribute name
 					String attName = att.getName();
 

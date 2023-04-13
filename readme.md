@@ -53,6 +53,7 @@ Usually, Declare Process Model has 4 types of lines:
 - Defining the resources values and a value can be only 3 types: integer range, float range and enumeration(strings with , separated)
 - Constraint templates
 
+More declare models can be found under `src/main/resources/models/declare/`.
 
 #### TOOL
 The tool is based on the ASP and clingo.

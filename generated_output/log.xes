@@ -11,43 +11,57 @@
 			<string key="concept:name" value="ER_Registration"/>
 			<string key="lifecycle:transition" value="complete"/>
 			<string key="org:group" value="A"/>
-			<date key="time:timestamp" value="2023-03-09T18:01:15.092+01:00"/>
-		</event>
-		<event>
-			<string key="concept:name" value="ER_Registration"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="B"/>
-			<date key="time:timestamp" value="2023-03-09T20:45:57.475+01:00"/>
-		</event>
-	</trace>
-	<trace>
-		<event>
-			<string key="concept:name" value="ER_Triage"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="A"/>
-			<date key="time:timestamp" value="2023-03-09T19:00:58.583+01:00"/>
-			<int key="Age" value="29"/>
-		</event>
-		<event>
-			<string key="concept:name" value="ER_Registration"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="C"/>
-			<date key="time:timestamp" value="2023-03-09T19:14:26.885+01:00"/>
-		</event>
-	</trace>
-	<trace>
-		<event>
-			<string key="concept:name" value="ER_Triage"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="A"/>
-			<date key="time:timestamp" value="2023-03-09T18:45:51.941+01:00"/>
-			<int key="Age" value="76"/>
+			<date key="time:timestamp" value="2023-04-13T22:21:41.657+02:00"/>
 		</event>
 		<event>
 			<string key="concept:name" value="ER_Registration"/>
 			<string key="lifecycle:transition" value="complete"/>
 			<string key="org:group" value="M"/>
-			<date key="time:timestamp" value="2023-03-09T20:24:09.412+01:00"/>
+			<date key="time:timestamp" value="2023-04-14T01:22:11.025+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ER_Triage"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="C"/>
+			<date key="time:timestamp" value="2023-04-13T22:34:20.233+02:00"/>
+			<int key="Age" value="37"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ER_Registration"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="A"/>
+			<date key="time:timestamp" value="2023-04-14T01:54:02.646+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ER_Triage"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="L"/>
+			<date key="time:timestamp" value="2023-04-13T23:11:14.312+02:00"/>
+			<int key="Age" value="53"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ER_Registration"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="A"/>
+			<date key="time:timestamp" value="2023-04-14T00:06:26.783+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ER_Registration"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="A"/>
+			<date key="time:timestamp" value="2023-04-14T00:23:19.148+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ER_Registration"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:group" value="A"/>
+			<date key="time:timestamp" value="2023-04-14T00:39:47.042+02:00"/>
 		</event>
 	</trace>
 	<trace>
@@ -55,29 +69,14 @@
 			<string key="concept:name" value="ER_Triage"/>
 			<string key="lifecycle:transition" value="complete"/>
 			<string key="org:group" value="B"/>
-			<date key="time:timestamp" value="2023-03-09T20:22:38.387+01:00"/>
-			<int key="Age" value="52"/>
-		</event>
-		<event>
-			<string key="concept:name" value="ER_Registration"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="I"/>
-			<date key="time:timestamp" value="2023-03-09T20:38:27.074+01:00"/>
-		</event>
-	</trace>
-	<trace>
-		<event>
-			<string key="concept:name" value="ER_Triage"/>
-			<string key="lifecycle:transition" value="complete"/>
-			<string key="org:group" value="E"/>
-			<date key="time:timestamp" value="2023-03-09T18:38:45.688+01:00"/>
-			<int key="Age" value="69"/>
+			<date key="time:timestamp" value="2023-04-13T22:45:46.173+02:00"/>
+			<int key="Age" value="20"/>
 		</event>
 		<event>
 			<string key="concept:name" value="ER_Registration"/>
 			<string key="lifecycle:transition" value="complete"/>
 			<string key="org:group" value="A"/>
-			<date key="time:timestamp" value="2023-03-09T19:52:38.564+01:00"/>
+			<date key="time:timestamp" value="2023-04-14T00:37:03.320+02:00"/>
 		</event>
 	</trace>
 </log>

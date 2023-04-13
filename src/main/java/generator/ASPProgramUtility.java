@@ -2,7 +2,7 @@ package main.java.generator;
 
 import main.java.declare.core.Template;
 
-public class Global {
+public class ASPProgramUtility {
 	public static final String LP_GENERATION_PROBLEM = 
 			"time(1..t). %t = lunghezza traccia\n"
 			+ "\n"
