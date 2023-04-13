@@ -5,7 +5,7 @@
 
 	<groupId>AspLogGenerator</groupId>
 	<artifactId>AspLogGenerator</artifactId>
-	<version>1.2</version>
+	<version>1.0</version>
 	<name>AspLogGenerator</name>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
