@@ -5,4 +5,4 @@ AspLogGenerator.iml
 out
 out/
 target/
-target/AspLogGenerator-1.2.jar
+!target/AspLogGenerator-1.0.jar
